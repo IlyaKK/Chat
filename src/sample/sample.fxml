@@ -51,6 +51,7 @@
         <menus>
           <Menu mnemonicParsing="false" text="Файл">
             <items>
+                  <MenuItem fx:id="addMenu" mnemonicParsing="false" onAction="#addPerson" text="Добавить участника" />
               <MenuItem mnemonicParsing="false" onAction="#exit" text="Закрыть" />
             </items>
           </Menu>

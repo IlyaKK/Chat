@@ -2,8 +2,15 @@ package sample;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -21,6 +28,9 @@ public class Controller {
 
     @FXML
     private Button sendBtn;
+
+    @FXML
+    private MenuItem addMenu;
 
     private final ObservableList<String> messageList = FXCollections.observableArrayList("привет!", "hello", "hey");
 
@@ -60,6 +70,47 @@ public class Controller {
         }else {
             listMessage.getItems().add(name.toString() + " " + message + " : " + dateFormat.format(date));
         }
+    }
+
+    @FXML
+    void addPerson() {
+        TextField newPerson = new TextField();
+        StackPane secondaryLayout = new StackPane();
+
+        Button button = new Button();
+        button.setText("Добавить");
+
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String message = newPerson.getText();
+                if(!message.isBlank()){
+                    listPerson.getItems().add(newPerson.getText());
+                }else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Ошибка");
+                    alert.setHeaderText("Ошибка ввода данных");
+                    alert.setContentText("У участника должно быть имя");
+                    alert.show();
+                }
+                newPerson.clear();
+            }
+        });
+
+        StackPane.setAlignment(newPerson, Pos.TOP_CENTER);
+        StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
+
+        secondaryLayout.getChildren().add(newPerson);
+        secondaryLayout.getChildren().add(button);
+
+        Scene secondScene = new Scene(secondaryLayout, 300, 100);
+
+        Stage newWindow = new Stage();
+        newWindow.setTitle("Добавить участника");
+        newWindow.setScene(secondScene);
+
+        newWindow.initModality(Modality.APPLICATION_MODAL);
+        newWindow.show();
     }
 
     @FXML
