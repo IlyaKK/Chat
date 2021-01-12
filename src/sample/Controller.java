@@ -2,8 +2,6 @@ package sample;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,12 +23,6 @@ public class Controller {
 
     @FXML
     private TextField messageField;
-
-    @FXML
-    private Button sendBtn;
-
-    @FXML
-    private MenuItem addMenu;
 
     private final ObservableList<String> messageList = FXCollections.observableArrayList("привет!", "hello", "hey");
 
@@ -80,21 +72,18 @@ public class Controller {
         Button button = new Button();
         button.setText("Добавить");
 
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String message = newPerson.getText();
-                if(!message.isBlank()){
-                    listPerson.getItems().add(newPerson.getText());
-                }else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Ошибка");
-                    alert.setHeaderText("Ошибка ввода данных");
-                    alert.setContentText("У участника должно быть имя");
-                    alert.show();
-                }
-                newPerson.clear();
+        button.setOnAction(event -> {
+            String message = newPerson.getText();
+            if(!message.isBlank()){
+                listPerson.getItems().add(newPerson.getText());
+            }else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка ввода данных");
+                alert.setContentText("У участника должно быть имя");
+                alert.show();
             }
+            newPerson.clear();
         });
 
         StackPane.setAlignment(newPerson, Pos.TOP_CENTER);
