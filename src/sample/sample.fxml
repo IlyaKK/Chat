@@ -50,14 +50,14 @@
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu mnemonicParsing="false" text="Файл">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#exit" text="Close" />
+              <MenuItem mnemonicParsing="false" onAction="#exit" text="Закрыть" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help">
+          <Menu mnemonicParsing="false" text="О программе">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#showAbout" text="About" />
+              <MenuItem mnemonicParsing="false" onAction="#showAbout" text="О чате" />
             </items>
           </Menu>
         </menus>

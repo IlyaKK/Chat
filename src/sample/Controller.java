@@ -3,11 +3,14 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 
-import javax.xml.crypto.Data;
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Controller {
     @FXML
@@ -48,8 +51,9 @@ public class Controller {
     }
 
     private void addMessageToListMessage(String message) {
-        Date data = new Date();
-        listMessage.getItems().add(message + " :" + data);
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        listMessage.getItems().add(message + " :" + dateFormat.format(date));
     }
 
     @FXML
