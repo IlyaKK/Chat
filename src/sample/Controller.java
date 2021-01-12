@@ -5,12 +5,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 public class Controller {
     @FXML
@@ -53,7 +50,16 @@ public class Controller {
     private void addMessageToListMessage(String message) {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
-        listMessage.getItems().add(message + " :" + dateFormat.format(date));
+        ObservableList<String> name = listPerson.getSelectionModel().getSelectedItems();
+        if(name.isEmpty()){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Не выбран участник");
+            alert.setContentText("Выберите имя пишущего из списка участников");
+            alert.show();
+        }else {
+            listMessage.getItems().add(name.toString() + " " + message + " : " + dateFormat.format(date));
+        }
     }
 
     @FXML
