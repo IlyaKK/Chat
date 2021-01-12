@@ -3,7 +3,11 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
+
+import javax.xml.crypto.Data;
+import java.util.Date;
 
 public class Controller {
     @FXML
@@ -44,7 +48,8 @@ public class Controller {
     }
 
     private void addMessageToListMessage(String message) {
-        listMessage.getItems().add(message);
+        Date data = new Date();
+        listMessage.getItems().add(message + " :" + data);
     }
 
     @FXML
