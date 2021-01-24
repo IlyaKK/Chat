@@ -25,9 +25,9 @@ public class EchoServer {
                 DataInputStream in = new DataInputStream(clientSocket.getInputStream());
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+                serverMessage(out);
                 try {
                     while (true) {
-                        serverMessage(out);
                         String message = in.readUTF();
 
                         if (message.equals("/server-stop")) {
@@ -53,8 +53,10 @@ public class EchoServer {
         Thread thread = new Thread(() -> {
             try{
                 while (true){
-                    String message = inServer.nextLine();
-                    out.writeUTF("Сервер: " + message);
+                    if(out.size() == 0){
+                        String message = inServer.nextLine();
+                        out.writeUTF("Сервер: " + message);
+                    }
                 }
             }catch (IOException e){
                 System.out.println("Ошибка отправки сообщения с сервера");
