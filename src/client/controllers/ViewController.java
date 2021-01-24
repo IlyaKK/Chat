@@ -1,20 +1,26 @@
-package sample;
+package client.controllers;
 
+import client.EchoClient;
+import client.models.Network;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Controller {
+public class ViewController {
     @FXML
     private ListView<String> listPerson;
 
@@ -24,44 +30,49 @@ public class Controller {
     @FXML
     private TextField messageField;
 
-    private final ObservableList<String> messageList = FXCollections.observableArrayList("привет!", "hello", "hey");
+    private Network network;
 
-    private final ObservableList<String> personList = FXCollections.observableArrayList("Марк", "Коля", "Настя");
+    private final ObservableList<String> messageList = FXCollections.observableArrayList();
 
     @FXML
     public void initialize(){
         listMessage.setItems(messageList);
-        listPerson.setItems(personList);
+        listPerson.setItems(FXCollections.observableArrayList(EchoClient.USERS_TEST_DATA));
     }
 
     @FXML
     public void sendMessage() {
-        String message = messageField.getText();
-        if(!message.isBlank()){
-            addMessageToListMessage(message);
-        }else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Ошибка");
-            alert.setHeaderText("Ошибка ввода данных");
-            alert.setContentText("Не отправляйте пустое сообщение");
-            alert.show();
-        }
-        messageField.clear();
-    }
-
-    private void addMessageToListMessage(String message) {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date();
         ObservableList<String> name = listPerson.getSelectionModel().getSelectedItems();
-        if(name.isEmpty()){
+        if(name.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Не выбран участник");
             alert.setContentText("Выберите имя пишущего из списка участников");
             alert.show();
         }else {
-            listMessage.getItems().add(name.toString() + " " + message + " : " + dateFormat.format(date));
+            String message = messageField.getText();
+            if (!message.isBlank()) {
+                try {
+                    network.getOut().writeUTF(name + " " + message);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Ошибка при отправке сообщения");
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка ввода данных");
+                alert.setContentText("Не отправляйте пустое сообщение");
+                alert.show();
+            }
         }
+        messageField.clear();
+    }
+
+    public void addMessageToListMessage(String message) {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        listMessage.getItems().add(message + " : " + dateFormat.format(date));
     }
 
     @FXML
@@ -114,5 +125,9 @@ public class Controller {
         alert.setHeaderText("Homework 4");
         alert.setContentText("Chat");
         alert.show();
+    }
+
+    public void setNetwork(Network network) {
+        this.network = network;
     }
 }
