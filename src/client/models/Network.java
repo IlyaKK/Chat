@@ -16,6 +16,13 @@ public class Network {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private static final String AUTH_CMD_PREFIX = "/auth"; // + login + pass
+    private static final String AUTHOK_CMD_PREFIX = "/authok"; // + username
+    private static final String AUTHERR_CMD_PREFIX = "/autherr"; // + error message
+    private static final String CLIENT_MSG_CMD_PREFIX = "/clientMsg"; // + msg
+    private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
+    private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
+    private static final String END_CMD_PREFIX = "/end"; //
 
     private final int port;
     private final String host;
@@ -41,6 +48,9 @@ public class Network {
             try {
                 while (true) {
                     String message = in.readUTF();
+                    if(message.startsWith(AUTHOK_CMD_PREFIX)){
+                        Platform.runLater(() -> viewController.;
+                    }
                     Platform.runLater(() -> viewController.addMessageToListMessage(message));
                 }
             } catch (IOException e) {

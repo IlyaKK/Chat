@@ -36,35 +36,24 @@ public class ViewController {
 
     @FXML
     public void initialize(){
-        listMessage.setItems(messageList);
-        listPerson.setItems(FXCollections.observableArrayList(EchoClient.USERS_TEST_DATA));
     }
 
     @FXML
     public void sendMessage() {
-        ObservableList<String> name = listPerson.getSelectionModel().getSelectedItems();
-        if(name.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Не выбран участник");
-            alert.setContentText("Выберите имя пишущего из списка участников");
-            alert.show();
-        }else {
-            String message = messageField.getText();
-            if (!message.isBlank()) {
-                try {
-                    network.getOut().writeUTF(name + " " + message);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Ошибка при отправке сообщения");
-                }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Ошибка");
-                alert.setHeaderText("Ошибка ввода данных");
-                alert.setContentText("Не отправляйте пустое сообщение");
-                alert.show();
+        String message = messageField.getText();
+        if (!message.isBlank()) {
+            try {
+                network.getOut().writeUTF(message);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Ошибка при отправке сообщения");
             }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Ошибка");
+            alert.setHeaderText("Ошибка ввода данных");
+            alert.setContentText("Не отправляйте пустое сообщение");
+            alert.show();
         }
         messageField.clear();
     }
