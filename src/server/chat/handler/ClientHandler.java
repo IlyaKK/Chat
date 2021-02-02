@@ -96,7 +96,10 @@ public class ClientHandler {
                 return;
             }
             else if (message.startsWith(PRIVATE_MSG_CMD_PREFIX)) {
-
+                String[] parts = message.split("\\s+", 3);
+                String nick = parts[1];
+                String privMessage = parts[2];
+                myServer.sendPrivatMessage(nick, privMessage, this);
             } else {
                 myServer.broadcastMessage(message, this);
             }

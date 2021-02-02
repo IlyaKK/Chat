@@ -71,10 +71,18 @@ public class MyServer {
 
     public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
-            /*if(client == sender) {
+            if(client == sender) {
                 continue;
-            }*/
+            }
             client.sendMessage(sender.getUsername(), message);
+        }
+    }
+
+    public synchronized void sendPrivatMessage(String nick, String privMessage, ClientHandler sender) throws IOException {
+        for (ClientHandler client : clients) {
+                if (client.getUsername().equals(nick)) {
+                    client.sendMessage(sender.getUsername(), privMessage);
+                }
         }
     }
 }
