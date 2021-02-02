@@ -1,6 +1,6 @@
-package client.models;
+package client3.models;
 
-import client.controllers.ViewController;
+import client3.controllers.ViewController;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 

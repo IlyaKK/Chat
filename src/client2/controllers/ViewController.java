@@ -1,7 +1,7 @@
-package client.controllers;
+package client2.controllers;
 
-import client.EchoClient;
-import client.models.Network;
+import client2.EchoClient;
+import client2.models.Network;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

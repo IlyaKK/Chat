@@ -71,9 +71,9 @@ public class MyServer {
 
     public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
-            if(client == sender) {
+            /*if(client == sender) {
                 continue;
-            }
+            }*/
             client.sendMessage(sender.getUsername(), message);
         }
     }

@@ -1,7 +1,7 @@
-package client;
+package client2;
 
-import client.controllers.ViewController;
-import client.models.Network;
+import client2.controllers.ViewController;
+import client2.models.Network;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
