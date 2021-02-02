@@ -22,6 +22,7 @@ public class ClientHandler {
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
     private static final String END_CMD_PREFIX = "/end"; //
     private String username;
+    private String login;
 
     public ClientHandler(MyServer myServer, Socket socket) {
         this.myServer = myServer;
@@ -63,6 +64,7 @@ public class ClientHandler {
         String[] parts = message.split("\\s+", 3);
         String login = parts[1];
         String password = parts[2];
+        this.login = login;
 
         AuthService authService = myServer.getAuthService();
 
@@ -108,6 +110,10 @@ public class ClientHandler {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getLogin() {
+        return login;
     }
 
     public void sendMessage(String sender, String message) throws IOException {

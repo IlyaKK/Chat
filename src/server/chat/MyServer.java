@@ -80,7 +80,7 @@ public class MyServer {
 
     public synchronized void sendPrivatMessage(String nick, String privMessage, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
-                if (client.getUsername().equals(nick)) {
+                if (client.getLogin().equals(nick)) {
                     client.sendMessage(sender.getUsername(), privMessage);
                 }
         }
