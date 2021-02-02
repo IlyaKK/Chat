@@ -12,11 +12,6 @@ import server.chat.User;
 import java.util.List;
 
 public class EchoClient extends Application {
-    private static final List<User> clients = List.of(
-            new User("martin", "1111", "Мартин_Некотов"),
-            new User("boris", "2222", "Борис_Николаевич"),
-            new User("gena", "3333", "Гендальф_Серый")
-    );
 
     @Override
     public void start(Stage stage) throws Exception {

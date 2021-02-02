@@ -64,7 +64,6 @@ public class ClientHandler {
         String[] parts = message.split("\\s+", 3);
         String login = parts[1];
         String password = parts[2];
-        this.login = login;
 
         AuthService authService = myServer.getAuthService();
 
@@ -77,6 +76,7 @@ public class ClientHandler {
             }
 
 
+            this.login = login;
             out.writeUTF(AUTHOK_CMD_PREFIX + " " + username);
             myServer.subscribe(this);
             return true;
