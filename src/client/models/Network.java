@@ -1,8 +1,7 @@
 package client.models;
 
-import client.controllers.ViewController;
+import client.controllers.ChatController;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 
 import java.io.DataInputStream;
 import java.io.DataOutput;
@@ -26,6 +25,7 @@ public class Network {
 
     private final int port;
     private final String host;
+    private String userName;
 
     public Network() {
         this.host = DEFAULT_SERVER_HOST;
@@ -43,7 +43,7 @@ public class Network {
         }
     }
 
-    public void waitMessage(ViewController viewController) {
+    public void waitMessage(ChatController chatController) {
         Thread thread = new Thread(() -> {
             try {
                 while (true) {
@@ -51,9 +51,10 @@ public class Network {
                     if(message.startsWith(AUTHOK_CMD_PREFIX)){
                         String[] parts = message.split("\\s+", 2);
                         String name = parts[1];
-                        Platform.runLater(() -> viewController.addPersonToListPerson(name));
+                        Platform.runLater(() -> chatController.addPersonToListPerson(name));
+                        Platform.runLater(() -> chatController.addMessageToListMessage(message + " в чате"));
                     }
-                    Platform.runLater(() -> viewController.addMessageToListMessage(message));
+                    Platform.runLater(() -> chatController.addMessageToListMessage(message));
                 }
             } catch (IOException e) {
                 System.out.println("Ошибка подключения");
@@ -67,5 +68,33 @@ public class Network {
 
     public DataOutput getOut() {
         return out;
+    }
+
+    public String sendAuthCommand(String login, String password) {
+        try {
+            out.writeUTF(String.format("%s %s %s", AUTH_CMD_PREFIX, login, password));
+
+            String response = in.readUTF();
+            if (response.startsWith(AUTHOK_CMD_PREFIX)) {
+                this.userName = response.split("\\s+", 2)[1];
+                return null;
+            } else {
+                return response.split("\\s+", 2)[1];
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
+    public String getUsername() {
+        return userName;
+    }
+
+    public void sendPrivateMessage(String message, String selectedRecipient) {
+    }
+
+    public void sendMessage(String message) throws IOException {
+        out.writeUTF(message);
     }
 }
