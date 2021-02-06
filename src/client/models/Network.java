@@ -8,6 +8,7 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 public class Network {
     private static final int DEFAULT_SERVER_SOCKET = 8888;
@@ -21,6 +22,7 @@ public class Network {
     private static final String CLIENT_MSG_CMD_PREFIX = "/clientMsg"; // + msg
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
+    private static final String CLIENT_ADD_CMD_PREFIX = "/addedClient"; // + clients
     private static final String END_CMD_PREFIX = "/end"; //
 
     private final int port;
@@ -30,6 +32,10 @@ public class Network {
     public Network() {
         this.host = DEFAULT_SERVER_HOST;
         this.port = DEFAULT_SERVER_SOCKET;
+    }
+
+    public DataOutput getOut() {
+        return out;
     }
 
     public void connect() {
@@ -48,13 +54,25 @@ public class Network {
             try {
                 while (true) {
                     String message = in.readUTF();
-                    if(message.startsWith(AUTHOK_CMD_PREFIX)){
+                    if (message.startsWith(CLIENT_MSG_CMD_PREFIX)) {
+                        String[] parts = message.split("\\s+", 3);
+                        String sender = parts[1];
+                        String messageFromUser = parts[2];
+
+                        Platform.runLater(() -> chatController.addMessageToListMessage(String.format("%s: %s", sender, messageFromUser)));
+                    } else if (message.startsWith(SERVER_MSG_CMD_PREFIX)) {
                         String[] parts = message.split("\\s+", 2);
-                        String name = parts[1];
-                        Platform.runLater(() -> chatController.addPersonToListPerson(name));
-                        Platform.runLater(() -> chatController.addMessageToListMessage(message + " в чате"));
+                        String messageFromUser = parts[1];
+
+                        Platform.runLater(() -> chatController.addMessageToListMessage(messageFromUser));
+                    } else if (message.startsWith(CLIENT_ADD_CMD_PREFIX)) {
+                        String[] parts1 = message.split("\\s+", 2);
+                        String[] listPersons = parts1[1].split("\\s+");
+                        List<String> newListPersons = List.of(listPersons);
+                        Platform.runLater(() ->chatController.updatePersonsInList(newListPersons));
+                } else {
+                        Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
                     }
-                    Platform.runLater(() -> chatController.addMessageToListMessage(message));
                 }
             } catch (IOException e) {
                 System.out.println("Ошибка подключения");
@@ -64,10 +82,6 @@ public class Network {
 
         thread.setDaemon(true);
         thread.start();
-    }
-
-    public DataOutput getOut() {
-        return out;
     }
 
     public String sendAuthCommand(String login, String password) {
@@ -91,7 +105,9 @@ public class Network {
         return userName;
     }
 
-    public void sendPrivateMessage(String message, String selectedRecipient) {
+    public void sendPrivateMessage(String message, String selectedRecipient) throws IOException {
+        String command = String.format("%s %s %s", PRIVATE_MSG_CMD_PREFIX, selectedRecipient, message);
+        sendMessage(command);
     }
 
     public void sendMessage(String message) throws IOException {

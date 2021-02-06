@@ -1,6 +1,5 @@
 package server.chat;
 
-import jdk.dynalink.linker.LinkerServices;
 import server.chat.auth.BaseAuthService;
 import server.chat.handler.ClientHandler;
 
@@ -28,7 +27,6 @@ public class MyServer {
 
         System.out.println("Сервер запущен!");
 
-
         try {
             while (true) {
                 waitAndProcessNewClientConnection();
@@ -52,12 +50,14 @@ public class MyServer {
         clientHandler.handle();
     }
 
-    public synchronized void subscribe(ClientHandler clientHandler) {
+    public synchronized void subscribe(ClientHandler clientHandler) throws IOException {
         clients.add(clientHandler);
+        updateListClients();
     }
 
-    public synchronized void unSubscribe(ClientHandler clientHandler) {
+    public synchronized void unSubscribe(ClientHandler clientHandler) throws IOException {
         clients.remove(clientHandler);
+        updateListClients();
     }
 
     public synchronized boolean isUsernameBusy(String username) {
@@ -69,20 +69,38 @@ public class MyServer {
         return false;
     }
 
-    public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
+    public synchronized void broadcastMessage(String message, ClientHandler sender, String isServerMessage) throws IOException {
         for (ClientHandler client : clients) {
-            if(client == sender) {
+            if (client == sender) {
                 continue;
             }
-            client.sendMessage(sender.getUsername(), message);
+            if(isServerMessage.equals("/serverMsg")){
+                client.sendServerMessage(message);
+            }else {
+                client.sendMessage(sender.getUsername(), message);
+            }
         }
     }
 
-    public synchronized void sendPrivatMessage(String nick, String privMessage, ClientHandler sender) throws IOException {
+    public synchronized void broadcastMessage(String message, ClientHandler sender) throws IOException {
+        broadcastMessage(message, sender, "/clientMsg");
+    }
+
+    public synchronized void sendPrivatMessage(String userName, String privMessage, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
-                if (client.getLogin().equals(nick)) {
-                    client.sendMessage(sender.getUsername(), privMessage);
-                }
+            if (client.getUsername().equals(userName)) {
+                client.sendMessage(sender.getUsername(), privMessage);
+            }
+        }
+    }
+
+    private void updateListClients() throws IOException {
+        StringBuilder clientsString = new StringBuilder();
+        for(ClientHandler client:clients){
+            clientsString.append(client.getUsername()).append(" ");
+        }
+        for(ClientHandler client:clients) {
+            client.sendUpdateListClients(clientsString);
         }
     }
 }

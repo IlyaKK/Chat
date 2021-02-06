@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class ChatController {
     @FXML
@@ -31,6 +32,10 @@ public class ChatController {
 
     private final ObservableList<String> messageList = FXCollections.observableArrayList();
     private String selectedRecipient;
+
+    public void updatePersonsInList(List<String> newListPersons) {
+        listPerson.setItems(FXCollections.observableArrayList(newListPersons));
+    }
 
     @FXML
     public void initialize(){
@@ -60,11 +65,16 @@ public class ChatController {
     public void sendMessage() {
         String message = messageField.getText();
         if (!message.isBlank()) {
+            addMessageToListMessage("Я " + message);
             try {
-                network.getOut().writeUTF(message);
+                if (selectedRecipient != null) {
+                    network.sendPrivateMessage(message, selectedRecipient);
+                } else {
+                    network.sendMessage(message);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Ошибка при отправке сообщения");
+                System.out.println("!!Ошибка при отправке сообщения");
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -74,16 +84,6 @@ public class ChatController {
             alert.show();
         }
         messageField.clear();
-        try {
-            if (selectedRecipient != null) {
-                network.sendPrivateMessage(message, selectedRecipient);
-            } else {
-                network.sendMessage(message);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("!!Ошибка при отправке сообщения");
-        }
     }
 
     public void addMessageToListMessage(String message) {
@@ -92,9 +92,7 @@ public class ChatController {
         listMessage.getItems().add(message + " : " + dateFormat.format(date));
     }
 
-    public void addPersonToListPerson(String name){
-        listPerson.getItems().add(name);
-    }
+
 
     @FXML
     void addPerson() {
@@ -151,6 +149,4 @@ public class ChatController {
     public void setNetwork(Network network) {
         this.network = network;
     }
-
-
 }

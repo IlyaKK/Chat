@@ -36,10 +36,8 @@ public class ChatGB extends Application {
 
         Parent root = loader.load();
 
-        primaryStage.setTitle("Messenger");
+        primaryStage.setTitle("Chat");
         primaryStage.setScene(new Scene(root));
-        primaryStage.setX(2200);
-
 
         chatController = loader.getController();
         chatController.setNetwork(network);
@@ -56,7 +54,6 @@ public class ChatGB extends Application {
         authStage.setScene(new Scene(root));
         authStage.initModality(Modality.WINDOW_MODAL);
         authStage.initOwner(primaryStage);
-        authStage.setX(2200);
         authStage.show();
 
         AuthController authLoaderController = authLoader.getController();

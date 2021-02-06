@@ -20,6 +20,7 @@ public class ClientHandler {
     private static final String CLIENT_MSG_CMD_PREFIX = "/clientMsg"; // + msg
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
+    private static final String CLIENT_ADD_CMD_PREFIX = "/addedClient"; // + clients
     private static final String END_CMD_PREFIX = "/end"; //
     private String username;
     private String login;
@@ -41,6 +42,12 @@ public class ClientHandler {
                 readMessage();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
+            } finally {
+                try {
+                    closeConnection();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
@@ -75,9 +82,9 @@ public class ClientHandler {
                 return false;
             }
 
-
             this.login = login;
             out.writeUTF(AUTHOK_CMD_PREFIX + " " + username);
+            myServer.broadcastMessage(String.format(">>> %s присоединился к чату", username), this, SERVER_MSG_CMD_PREFIX);
             myServer.subscribe(this);
             return true;
 
@@ -99,9 +106,9 @@ public class ClientHandler {
             }
             else if (message.startsWith(PRIVATE_MSG_CMD_PREFIX)) {
                 String[] parts = message.split("\\s+", 3);
-                String nick = parts[1];
+                String userName = parts[1];
                 String privMessage = parts[2];
-                myServer.sendPrivatMessage(nick, privMessage, this);
+                myServer.sendPrivatMessage(userName, privMessage, this);
             } else {
                 myServer.broadcastMessage(message, this);
             }
@@ -118,5 +125,26 @@ public class ClientHandler {
 
     public void sendMessage(String sender, String message) throws IOException {
         out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
+    }
+
+    public void sendServerMessage(String message) throws IOException {
+        out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message));
+    }
+
+    public void sendUpdateListClients(StringBuilder message) throws IOException {
+        out.writeUTF(String.format("%s %s", CLIENT_ADD_CMD_PREFIX, message));
+    }
+
+    public void closeConnection() throws IOException {
+        myServer.unSubscribe(this);
+        myServer.broadcastMessage(String.format(">>> %s вышел из чата", username), this, SERVER_MSG_CMD_PREFIX);
+        try {
+            in.close();
+            out.close();
+            clientSocket.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
     }
 }
