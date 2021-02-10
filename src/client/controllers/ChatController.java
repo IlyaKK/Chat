@@ -1,16 +1,13 @@
 package client.controllers;
 
-import client.EchoClient;
 import client.models.Network;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,8 +16,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-public class ViewController {
+public class ChatController {
     @FXML
     private ListView<String> listPerson;
 
@@ -33,20 +31,50 @@ public class ViewController {
     private Network network;
 
     private final ObservableList<String> messageList = FXCollections.observableArrayList();
+    private String selectedRecipient;
+
+    public void updatePersonsInList(List<String> newListPersons) {
+        listPerson.setItems(FXCollections.observableArrayList(newListPersons));
+    }
 
     @FXML
     public void initialize(){
+        listPerson.setCellFactory(lv -> {
+            MultipleSelectionModel<String> selectionModel = listPerson.getSelectionModel();
+            ListCell<String> cell = new ListCell<>();
+            cell.textProperty().bind(cell.itemProperty());
+            cell.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                listPerson.requestFocus();
+                if (!cell.isEmpty()) {
+                    int index = cell.getIndex();
+                    if (selectionModel.getSelectedIndices().contains(index)) {
+                        selectionModel.clearSelection(index);
+                        selectedRecipient = null;
+                    } else {
+                        selectionModel.select(index);
+                        selectedRecipient = cell.getItem();
+                    }
+                    event.consume();
+                }
+            });
+            return cell;
+        });
     }
 
     @FXML
     public void sendMessage() {
         String message = messageField.getText();
         if (!message.isBlank()) {
+            addMessageToListMessage("Я " + message);
             try {
-                network.getOut().writeUTF(message);
+                if (selectedRecipient != null) {
+                    network.sendPrivateMessage(message, selectedRecipient);
+                } else {
+                    network.sendMessage(message);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Ошибка при отправке сообщения");
+                System.out.println("!!Ошибка при отправке сообщения");
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -64,9 +92,7 @@ public class ViewController {
         listMessage.getItems().add(message + " : " + dateFormat.format(date));
     }
 
-    public void addPersonToListPerson(String name){
-        listPerson.getItems().add(name);
-    }
+
 
     @FXML
     void addPerson() {
