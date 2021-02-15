@@ -69,6 +69,7 @@ public class Network {
                         String[] parts1 = message.split("\\s+", 2);
                         String[] listPersons = parts1[1].split("\\s+");
                         List<String> newListPersons = List.of(listPersons);
+
                         Platform.runLater(() ->chatController.updatePersonsInList(newListPersons));
                 } else {
                         Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
