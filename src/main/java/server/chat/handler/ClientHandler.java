@@ -7,6 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.SQLException;
 
 public class ClientHandler {
     private final MyServer myServer;
@@ -21,6 +22,8 @@ public class ClientHandler {
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
     private static final String CLIENT_ADD_CMD_PREFIX = "/addedClient"; // + clients
+    private static final String CHANGE_NICKNAME_PREFIX_OK = "/changeNicknameOk";
+    private static final String CHANGE_NICKNAME_PREFIX = "/changeNickname"; // + newNickname
     private static final String END_CMD_PREFIX = "/end"; //
     private String username;
     private String login;
@@ -74,6 +77,11 @@ public class ClientHandler {
 
         AuthService authService = myServer.getAuthService();
 
+        try {
+            authService.createClientsFromDB();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         username = authService.getUsernameByLoginAndPassword(login, password);
 
         if (username != null) {
@@ -109,6 +117,14 @@ public class ClientHandler {
                 String userName = parts[1];
                 String privMessage = parts[2];
                 myServer.sendPrivatMessage(userName, privMessage, this);
+            }else if (message.startsWith(CHANGE_NICKNAME_PREFIX)) {
+                String[] parts = message.split("\\s+", 2);
+                String newNick = parts[1];
+                try {
+                    myServer.changeNickname(this, newNick);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             } else {
                 myServer.broadcastMessage(message, this);
             }
@@ -133,6 +149,10 @@ public class ClientHandler {
 
     public void sendUpdateListClients(StringBuilder message) throws IOException {
         out.writeUTF(String.format("%s %s", CLIENT_ADD_CMD_PREFIX, message));
+    }
+
+    public void sendUpdateNickname(String newNick) throws IOException {
+        out.writeUTF(String.format("%s %s", CHANGE_NICKNAME_PREFIX_OK, newNick));
     }
 
     public void closeConnection() throws IOException {

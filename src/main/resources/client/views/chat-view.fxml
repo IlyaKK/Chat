@@ -52,6 +52,7 @@
           <Menu mnemonicParsing="false" text="Файл">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#addPerson" text="Добавить участника" />
+                  <MenuItem mnemonicParsing="false" onAction="#changeNick" text="Поменять никнейм" />
               <MenuItem mnemonicParsing="false" onAction="#exit" text="Закрыть" />
             </items>
           </Menu>

@@ -6,6 +6,7 @@ import server.chat.handler.ClientHandler;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,13 +95,22 @@ public class MyServer {
         }
     }
 
-    private void updateListClients() throws IOException {
+    private synchronized void updateListClients() throws IOException {
         StringBuilder clientsString = new StringBuilder();
         for(ClientHandler client:clients){
             clientsString.append(client.getUsername()).append(" ");
         }
         for(ClientHandler client:clients) {
             client.sendUpdateListClients(clientsString);
+        }
+    }
+
+    public synchronized void changeNickname(ClientHandler clientHandler, String newNick) throws SQLException, IOException {
+        for (ClientHandler client:clients) {
+            if(client.equals(clientHandler)){
+                authService.changeNickname(client.getLogin(), newNick);
+                client.sendUpdateNickname(newNick);
+            }
         }
     }
 }

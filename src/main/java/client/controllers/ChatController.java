@@ -92,8 +92,6 @@ public class ChatController {
         listMessage.getItems().add(message + " : " + dateFormat.format(date));
     }
 
-
-
     @FXML
     void addPerson() {
         TextField newPerson = new TextField();
@@ -129,6 +127,53 @@ public class ChatController {
         newWindow.setScene(secondScene);
 
         newWindow.initModality(Modality.APPLICATION_MODAL);
+        newWindow.show();
+    }
+
+    @FXML
+    void changeNick(){
+        TextField newNick = new TextField();
+        StackPane secondaryLayout = new StackPane();
+
+        Button button = new Button();
+        button.setText("Поменять");
+        StackPane.setAlignment(newNick, Pos.TOP_CENTER);
+        StackPane.setAlignment(button, Pos.BOTTOM_CENTER);
+
+        secondaryLayout.getChildren().add(newNick);
+        secondaryLayout.getChildren().add(button);
+
+        Scene secondScene = new Scene(secondaryLayout, 300, 100);
+
+        Stage newWindow = new Stage();
+        button.setOnAction(event -> {
+            String newNickName = newNick.getText();
+            Alert alert;
+            if(!newNickName.isBlank()){
+                try {
+                    network.sendChangeNickCommand(newNickName);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Уведомление");
+                alert.setHeaderText("Изменение ника");
+                alert.setContentText("Смена никнейм прошла успешно. Новый никнейм " + newNickName);
+
+            }else {
+                alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка");
+                alert.setHeaderText("Ошибка ввода данных");
+                alert.setContentText("Необходимо ввести новый ник");
+            }
+            alert.show();
+            newWindow.close();
+        });
+        newWindow.setTitle("Поменять никнейм");
+        newWindow.setScene(secondScene);
+
+        newWindow.initModality(Modality.WINDOW_MODAL);
         newWindow.show();
     }
 
