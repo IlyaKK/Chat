@@ -12,11 +12,13 @@ import java.util.List;
 
 public class MyServer {
     private final ServerSocket serverSocket;
+    private final ServerSocket serverSocket2;
     private final BaseAuthService authService;
     private final List<ClientHandler> clients = new ArrayList<>();
 
-    public MyServer(int port) throws IOException {
+    public MyServer(int port, int port2) throws IOException {
         this.serverSocket = new ServerSocket(port);
+        this.serverSocket2 = new ServerSocket(port2);
         this.authService = new BaseAuthService();
     }
 
@@ -41,13 +43,14 @@ public class MyServer {
     private void waitAndProcessNewClientConnection() throws IOException {
         System.out.println("Ожидание пользователя...");
         Socket socket = serverSocket.accept();
+        Socket socket2 = serverSocket2.accept();
         System.out.println("Клиент подключился");
 
-        processClientConnection(socket);
+        processClientConnection(socket, socket2);
     }
 
-    private void processClientConnection(Socket socket) throws IOException {
-        ClientHandler clientHandler = new ClientHandler(this, socket);
+    private void processClientConnection(Socket socket, Socket socket2) throws IOException {
+        ClientHandler clientHandler = new ClientHandler(this, socket, socket2);
         clientHandler.handle();
     }
 
@@ -90,7 +93,7 @@ public class MyServer {
     public synchronized void sendPrivatMessage(String userName, String privMessage, ClientHandler sender) throws IOException {
         for (ClientHandler client : clients) {
             if (client.getUsername().equals(userName)) {
-                client.sendMessage(sender.getUsername(), privMessage);
+                client.sendMessage(sender.getUsername(), privMessage, true);
             }
         }
     }

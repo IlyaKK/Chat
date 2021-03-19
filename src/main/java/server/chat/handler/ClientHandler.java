@@ -1,19 +1,25 @@
 package server.chat.handler;
 
+
 import server.chat.MyServer;
 import server.chat.auth.AuthService;
+import server.messages.Message;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ClientHandler {
     private final MyServer myServer;
     private final Socket clientSocket;
+    private final Socket clientSocket2;
     private DataOutputStream out;
     private DataInputStream in;
+    private ObjectOutputStream oos;
+    private ObjectInputStream ois;
 
     private static final String AUTH_CMD_PREFIX = "/auth"; // + login + pass
     private static final String AUTHOK_CMD_PREFIX = "/authok"; // + username
@@ -25,12 +31,16 @@ public class ClientHandler {
     private static final String CHANGE_NICKNAME_PREFIX_OK = "/changeNicknameOk";
     private static final String CHANGE_NICKNAME_PREFIX = "/changeNickname"; // + newNickname
     private static final String END_CMD_PREFIX = "/end"; //
+
     private String username;
     private String login;
 
-    public ClientHandler(MyServer myServer, Socket socket) {
+    private Message messages = new Message();
+
+    public ClientHandler(MyServer myServer, Socket socket, Socket socket2) {
         this.myServer = myServer;
         this.clientSocket = socket;
+        this.clientSocket2 = socket2;
     }
 
 
@@ -38,6 +48,8 @@ public class ClientHandler {
 
         out = new DataOutputStream(clientSocket.getOutputStream());
         in = new DataInputStream(clientSocket.getInputStream());
+        oos = new ObjectOutputStream(clientSocket2.getOutputStream());
+        ois = new ObjectInputStream(clientSocket2.getInputStream());
 
         new Thread(() -> {
             try {
@@ -140,15 +152,27 @@ public class ClientHandler {
     }
 
     public void sendMessage(String sender, String message) throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        messages.addMessage(message + " : " + dateFormat.format(date));
+        out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
+    }
+
+    public void sendMessage(String sender, String message, Boolean flagPrivateMsg) throws IOException {
         out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
     }
 
     public void sendServerMessage(String message) throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        messages.addMessage(message + " : " + dateFormat.format(date));
         out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message));
     }
 
     public void sendUpdateListClients(StringBuilder message) throws IOException {
         out.writeUTF(String.format("%s %s", CLIENT_ADD_CMD_PREFIX, message));
+        oos.writeObject(Message.class);
+        oos.writeObject(messages);
     }
 
     public void sendUpdateNickname(String newNick) throws IOException {
