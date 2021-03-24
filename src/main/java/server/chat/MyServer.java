@@ -2,6 +2,7 @@ package server.chat;
 
 import server.chat.auth.BaseAuthService;
 import server.chat.handler.ClientHandler;
+import server.messages.Message;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,6 +16,16 @@ public class MyServer {
     private final ServerSocket serverSocket2;
     private final BaseAuthService authService;
     private final List<ClientHandler> clients = new ArrayList<>();
+
+    private Message messages = new Message();
+
+    public List<String> getMessages() {
+        return messages.getMessages();
+    }
+
+    public void setMessages(String message) {
+        this.messages.addMessage(message);
+    }
 
     public MyServer(int port, int port2) throws IOException {
         this.serverSocket = new ServerSocket(port);

@@ -36,6 +36,8 @@
                 <version>3.8.0</version>
                 <configuration>
                     <release>11</release>
+                    <source>14</source>
+                    <target>14</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -44,7 +46,6 @@
                 <version>0.0.4</version>
                 <configuration>
                     <mainClass>client.ChatGB</mainClass>
-                    <executable>C:\JVM\jdk-15.0.2_windows-x64_bin\jdk-15.0.2\bin\java</executable>
                 </configuration>
             </plugin>
         </plugins>

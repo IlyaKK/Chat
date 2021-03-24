@@ -12,9 +12,8 @@ public class Network {
     private Socket socket;
     private Socket socket2;
     private DataInputStream in;
-    private DataOutputStream out;
     private ObjectInputStream ois;
-    private ObjectOutputStream oos;
+    private DataOutputStream out;
 
     private static final int DEFAULT_SERVER_SOCKET = 8888;
     private static final int DEFAULT_SERVER_SOCKET2 = 8889;
@@ -55,9 +54,8 @@ public class Network {
             socket = new Socket(host, port);
             socket2 = new Socket(host, port2);
             in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
             ois = new ObjectInputStream(socket2.getInputStream());
-            oos = new ObjectOutputStream(socket2.getOutputStream());
+            out = new DataOutputStream(socket.getOutputStream());
 
         } catch (IOException e) {
             System.out.println("Соединение не установлено");
@@ -66,6 +64,7 @@ public class Network {
     }
 
     public void waitMessage(ChatController chatController) {
+        addLastMessages(chatController);
         Thread thread = new Thread(() -> {
             try {
                 while (true) {
@@ -74,7 +73,6 @@ public class Network {
                         String[] parts = message.split("\\s+", 3);
                         String sender = parts[1];
                         String messageFromUser = parts[2];
-
                         Platform.runLater(() -> chatController.addMessageToListMessage(String.format("%s: %s", sender, messageFromUser)));
                     } else if (message.startsWith(SERVER_MSG_CMD_PREFIX)) {
                         String[] parts = message.split("\\s+", 2);
@@ -84,7 +82,6 @@ public class Network {
                         String[] parts1 = message.split("\\s+", 2);
                         String[] listPersons = parts1[1].split("\\s+");
                         List<String> newListPersons = List.of(listPersons);
-                        addLastMessages(chatController);
                         Platform.runLater(() -> chatController.updatePersonsInList(newListPersons));
                     } else if (message.startsWith(CHANGE_NICKNAME_PREFIX_OK)) {
                         String[] parts2 = message.split("\\s+", 2);
@@ -138,14 +135,21 @@ public class Network {
         sendMessage(command);
     }
 
-    public void addLastMessages(ChatController chatController) {
-        try {
-            messages.setMessages(((Message) ois.readObject()).getMessages());
-            for(String message: messages.getMessages()){
+    public Object receiveObject () throws IOException, ClassNotFoundException
+    {
+        return ois.readObject();
+    }
+
+    public void addLastMessages(ChatController chatController){
+            try {
+                List<String> obj = (List<String>) receiveObject();
+                messages.setMessages((List<String>)obj);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            for (String message : messages.getMessages()) {
                 Platform.runLater(() -> chatController.addMessageToListMessage(message));
             }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }
