@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MyServer {
@@ -85,15 +88,18 @@ public class MyServer {
     }
 
     public synchronized void broadcastMessage(String message, ClientHandler sender, String isServerMessage) throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
         if(isServerMessage.equals("/serverMsg")){
-            setMessages(message);
+            setMessages(message + " : " + dateFormat.format(date));
         }
         for (ClientHandler client : clients) {
             if (client == sender) {
+                client.sendMessage("Я ", message);
                 continue;
             }
             if(isServerMessage.equals("/serverMsg")){
-                client.sendServerMessage(message);
+                client.sendServerMessage(message + " : " + dateFormat.format(date));
             }else {
                 client.sendMessage(sender.getUsername(), message);
             }

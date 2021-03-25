@@ -65,7 +65,6 @@ public class ChatController {
     public void sendMessage() {
         String message = messageField.getText();
         if (!message.isBlank()) {
-            addMessageToListMessage("Я " + message);
             try {
                 if (selectedRecipient != null) {
                     network.sendPrivateMessage(message, selectedRecipient);
@@ -87,9 +86,8 @@ public class ChatController {
     }
 
     public void addMessageToListMessage(String message) {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date();
-        listMessage.getItems().add(message + " : " + dateFormat.format(date));
+        //listMessage.getItems().add(message + " : " + dateFormat.format(date));
+        listMessage.getItems().add(message);
     }
 
     @FXML

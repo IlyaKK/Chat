@@ -152,8 +152,8 @@ public class ClientHandler {
     public void sendMessage(String sender, String message) throws IOException {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
-        myServer.setMessages(String.format("%s: %s", sender, message));
-        out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
+        myServer.setMessages(String.format("%s: %s : %s", getUsername(), message, dateFormat.format(date)));
+        out.writeUTF(String.format("%s %s %s : %s", CLIENT_MSG_CMD_PREFIX, sender, message, dateFormat.format(date)));
     }
 
     public void sendMessage(String sender, String message, Boolean flagPrivateMsg) throws IOException {
