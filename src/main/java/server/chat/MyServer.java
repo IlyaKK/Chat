@@ -85,6 +85,9 @@ public class MyServer {
     }
 
     public synchronized void broadcastMessage(String message, ClientHandler sender, String isServerMessage) throws IOException {
+        if(isServerMessage.equals("/serverMsg")){
+            setMessages(message);
+        }
         for (ClientHandler client : clients) {
             if (client == sender) {
                 continue;

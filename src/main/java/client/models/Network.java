@@ -64,7 +64,6 @@ public class Network {
     }
 
     public void waitMessage(ChatController chatController) {
-        addLastMessages(chatController);
         Thread thread = new Thread(() -> {
             try {
                 while (true) {

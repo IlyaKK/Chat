@@ -67,6 +67,7 @@ public class ChatGB extends Application {
         primaryStage.show();
         primaryStage.setTitle(network.getUsername());
         primaryStage.setAlwaysOnTop(true);
+        network.addLastMessages(chatController);
         network.waitMessage(chatController);
     }
 

@@ -48,10 +48,10 @@ public class ClientHandler {
         out = new DataOutputStream(clientSocket.getOutputStream());
         oos = new ObjectOutputStream(clientSocket2.getOutputStream());
         in = new DataInputStream(clientSocket.getInputStream());
-        int k = 0;
         new Thread(() -> {
             try {
                 authentication();
+                sendLastMessages();
                 readMessage();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -78,16 +78,6 @@ public class ClientHandler {
                 out.writeUTF(AUTHERR_CMD_PREFIX + " Ошибка авторизации");
             }
         }
-    }
-
-    private void sendLastMessages() throws IOException {
-        sendObject(myServer.getMessages());
-    }
-
-    public void sendObject (Object object) throws IOException
-    {
-        oos.writeObject(object);
-        oos.flush();
     }
 
     private boolean processAuthCommand(String message) throws IOException {
@@ -126,7 +116,6 @@ public class ClientHandler {
     }
 
     private void readMessage() throws IOException {
-        sendLastMessages();
         while (true) {
             String message = in.readUTF();
             System.out.println("message | " + username + ": " + message);
@@ -172,14 +161,21 @@ public class ClientHandler {
     }
 
     public void sendServerMessage(String message) throws IOException {
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-        Date date = new Date();
-        myServer.setMessages(message);
         out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message));
     }
 
     public void sendUpdateListClients(StringBuilder message) throws IOException {
         out.writeUTF(String.format("%s %s", CLIENT_ADD_CMD_PREFIX, message));
+    }
+
+    public void sendObject (Object object) throws IOException
+    {
+        oos.writeObject(object);
+        oos.flush();
+    }
+
+    private void sendLastMessages() throws IOException {
+        sendObject(myServer.getMessages());
     }
 
     public void sendUpdateNickname(String newNick) throws IOException {
