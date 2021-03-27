@@ -3,6 +3,8 @@ package server.chat;
 import server.chat.auth.BaseAuthService;
 import server.chat.handler.ClientHandler;
 import server.messages.Message;
+import server.messages.ObjectReader;
+import server.messages.ObjectWriter;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -92,6 +94,7 @@ public class MyServer {
         Date date = new Date();
         if(isServerMessage.equals("/serverMsg")){
             setMessages(message + " : " + dateFormat.format(date));
+            saveMessages();
         }
         for (ClientHandler client : clients) {
             if (client == sender) {
@@ -135,5 +138,16 @@ public class MyServer {
                 client.sendUpdateNickname(newNick);
             }
         }
+    }
+
+    public void extractMessages(){
+        Message messages2 = (((Message)new ObjectReader().extractMessages()));
+        if(messages2.getMessages() != null){
+            messages.setMessages(messages2.getMessages());
+        }
+    }
+
+    public void saveMessages() {
+        new ObjectWriter().saveMessages(messages);
     }
 }

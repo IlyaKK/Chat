@@ -4,6 +4,7 @@ import client.controllers.AuthController;
 import client.controllers.ChatController;
 import client.models.Network;
 import javafx.application.Application;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -69,6 +70,11 @@ public class ChatGB extends Application {
         primaryStage.setAlwaysOnTop(true);
         network.addLastMessages(chatController);
         network.waitMessage(chatController);
+    }
+
+    @FXML
+    public void stop(){
+        network.saveLocalMessages();
     }
 
     public static void main(String[] args) {

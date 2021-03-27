@@ -2,10 +2,14 @@ package client.models;
 
 import client.controllers.ChatController;
 import client.messages.Message;
+import client.messages.ObjectWriter;
 import javafx.application.Platform;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class Network {
@@ -37,7 +41,8 @@ public class Network {
     private String userName;
     private String nickName;
 
-    private Message messages = new Message();
+    private final Message messages = new Message();
+    private final Message localMessages = new Message();
 
     public Network() {
         this.host = DEFAULT_SERVER_HOST;
@@ -121,11 +126,19 @@ public class Network {
     }
 
     public void sendPrivateMessage(String message, String selectedRecipient) throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        String endMessage = getUsername() + ": " + message + " : " + dateFormat.format(date);
+        localMessages.addMessage(endMessage);
         String command = String.format("%s %s %s", PRIVATE_MSG_CMD_PREFIX, selectedRecipient, message);
         sendMessage(command);
     }
 
     public void sendMessage(String message) throws IOException {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        Date date = new Date();
+        String endMessage = getUsername() + ": " + message + " : " + dateFormat.format(date);
+        localMessages.addMessage(endMessage);
         out.writeUTF(message);
     }
 
@@ -141,14 +154,25 @@ public class Network {
 
     public void addLastMessages(ChatController chatController){
             try {
-                List<String> obj = (List<String>) receiveObject();
-                messages.setMessages((List<String>)obj);
+                Object obj = receiveObject();
+                messages.setMessages((List<String>) obj);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
-
-            for (String message : messages.getMessages()) {
-                Platform.runLater(() -> chatController.addMessageToListMessage(message));
+            int sizeMessages = messages.getMessages().size();
+            if(sizeMessages < 100){
+                for (String message : messages.getMessages()) {
+                    Platform.runLater(() -> chatController.addMessageToListMessage(message));
+                }
+            }else {
+                for (int i = 0; i < 100; i++) {
+                    int finalI1 = i;
+                    Platform.runLater(() -> chatController.addMessageToListMessage(messages.getMessages().get(sizeMessages - finalI1)));
+                }
             }
+    }
+
+    public void saveLocalMessages() {
+        new ObjectWriter().saveMessages(localMessages, getUsername());
     }
 }

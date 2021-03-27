@@ -102,6 +102,7 @@ public class ClientHandler {
 
             this.login = login;
             out.writeUTF(AUTHOK_CMD_PREFIX + " " + username);
+            myServer.extractMessages();
             myServer.broadcastMessage(String.format(">>> %s присоединился к чату", username), this, SERVER_MSG_CMD_PREFIX);
             myServer.subscribe(this);
             return true;
@@ -153,6 +154,7 @@ public class ClientHandler {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
         myServer.setMessages(String.format("%s: %s : %s", getUsername(), message, dateFormat.format(date)));
+        myServer.saveMessages();
         out.writeUTF(String.format("%s %s %s : %s", CLIENT_MSG_CMD_PREFIX, sender, message, dateFormat.format(date)));
     }
 
@@ -175,6 +177,7 @@ public class ClientHandler {
     }
 
     private void sendLastMessages() throws IOException {
+
         sendObject(myServer.getMessages());
     }
 
@@ -185,6 +188,7 @@ public class ClientHandler {
     public void closeConnection() throws IOException {
         myServer.unSubscribe(this);
         myServer.broadcastMessage(String.format(">>> %s вышел из чата", username), this, SERVER_MSG_CMD_PREFIX);
+        myServer.saveMessages();
         try {
             in.close();
             out.close();
