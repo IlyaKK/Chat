@@ -150,20 +150,20 @@ public class ClientHandler {
         return login;
     }
 
-    public void sendMessage(String sender, String message) throws IOException {
+    public void sendMessage(String sender, String message, ClientHandler clientHandler) throws IOException {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         Date date = new Date();
-        myServer.setMessages(String.format("%s: %s : %s", getUsername(), message, dateFormat.format(date)));
         myServer.saveMessages();
         out.writeUTF(String.format("%s %s %s : %s", CLIENT_MSG_CMD_PREFIX, sender, message, dateFormat.format(date)));
     }
 
-    public void sendMessage(String sender, String message, Boolean flagPrivateMsg) throws IOException {
-        out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
-    }
-
     public void sendServerMessage(String message) throws IOException {
         out.writeUTF(String.format("%s %s", SERVER_MSG_CMD_PREFIX, message));
+        myServer.saveMessages();
+    }
+
+    public void sendMessage(String sender, String message, Boolean flagPrivateMsg) throws IOException {
+        out.writeUTF(String.format("%s %s %s", CLIENT_MSG_CMD_PREFIX, sender, message));
     }
 
     public void sendUpdateListClients(StringBuilder message) throws IOException {

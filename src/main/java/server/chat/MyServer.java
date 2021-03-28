@@ -22,7 +22,7 @@ public class MyServer {
     private final BaseAuthService authService;
     private final List<ClientHandler> clients = new ArrayList<>();
 
-    private Message messages = new Message();
+    private final Message messages = new Message();
 
     public List<String> getMessages() {
         return messages.getMessages();
@@ -94,17 +94,18 @@ public class MyServer {
         Date date = new Date();
         if(isServerMessage.equals("/serverMsg")){
             setMessages(message + " : " + dateFormat.format(date));
-            saveMessages();
+        }else{
+            setMessages(String.format("%s: %s : %s", sender.getUsername(), message, dateFormat.format(date)));
         }
         for (ClientHandler client : clients) {
             if (client == sender) {
-                client.sendMessage("Я ", message);
+                client.sendMessage("Я ", message, sender);
                 continue;
             }
             if(isServerMessage.equals("/serverMsg")){
                 client.sendServerMessage(message + " : " + dateFormat.format(date));
             }else {
-                client.sendMessage(sender.getUsername(), message);
+                client.sendMessage(sender.getUsername(), message, sender);
             }
         }
     }
