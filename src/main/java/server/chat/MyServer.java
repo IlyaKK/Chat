@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.*;
 
 public class MyServer {
     private final ServerSocket serverSocket;
@@ -31,6 +32,7 @@ public class MyServer {
     public void setMessages(String message) {
         this.messages.addMessage(message);
     }
+    public static final Logger LOGGER = Logger.getLogger("");
 
     public MyServer(int port, int port2) throws IOException {
         this.serverSocket = new ServerSocket(port);
@@ -43,8 +45,7 @@ public class MyServer {
     }
 
     public void start() {
-
-        System.out.println("Сервер запущен!");
+        LOGGER.info("Сервер запущен!");
 
         try {
             while (true) {
@@ -57,10 +58,10 @@ public class MyServer {
     }
 
     private void waitAndProcessNewClientConnection() throws IOException {
-        System.out.println("Ожидание пользователя...");
+        LOGGER.info("Ожидание пользователя...");
         Socket socket = serverSocket.accept();
         Socket socket2 = serverSocket2.accept();
-        System.out.println("Клиент подключился");
+        LOGGER.info("Клиент подключился");
 
         processClientConnection(socket, socket2);
     }

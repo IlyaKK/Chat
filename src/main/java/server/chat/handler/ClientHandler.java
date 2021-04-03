@@ -10,7 +10,9 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
+import static server.chat.MyServer.LOGGER;
 
 public class ClientHandler {
     private final MyServer myServer;
@@ -119,7 +121,7 @@ public class ClientHandler {
     private void readMessage() throws IOException {
         while (true) {
             String message = in.readUTF();
-            System.out.println("message | " + username + ": " + message);
+            LOGGER.info("message | " + username + ": " + message);
             if (message.startsWith(END_CMD_PREFIX)) {
                 return;
             }
