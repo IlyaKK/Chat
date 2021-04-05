@@ -40,11 +40,37 @@ public class MyServer {
         this.authService = new BaseAuthService();
     }
 
+    private void parametersLogger() {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        try {
+            Handler handler;
+            handler = new FileHandler("src/main/resources/serve/logs/serverLog.log");
+            LOGGER.addHandler(handler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        LOGGER.getHandlers()[0].setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return record.getLevel() + "\t" + record.getMessage() + "\t" + dateFormat.format(record.getMillis()) +
+                        "\n";
+            }
+        });
+        LOGGER.getHandlers()[1].setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return record.getLevel() + "\t" + record.getMessage() + "\t" + dateFormat.format(record.getMillis()) +
+                        "\n";
+            }
+        });
+    }
+
     public BaseAuthService getAuthService() {
         return authService;
     }
 
     public void start() {
+        parametersLogger();
         LOGGER.info("Сервер запущен!");
 
         try {
