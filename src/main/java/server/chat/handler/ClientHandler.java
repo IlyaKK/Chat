@@ -11,6 +11,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static server.chat.MyServer.LOGGER;
 
 public class ClientHandler {
     private final MyServer myServer;
@@ -76,6 +77,7 @@ public class ClientHandler {
                 }
             } else {
                 out.writeUTF(AUTHERR_CMD_PREFIX + " Ошибка авторизации");
+                LOGGER.warning(message + " Ошибка авторизации");
             }
         }
     }
@@ -97,6 +99,7 @@ public class ClientHandler {
         if (username != null) {
             if (myServer.isUsernameBusy(username)) {
                 out.writeUTF(AUTHERR_CMD_PREFIX + " Логин уже используется");
+                LOGGER.warning(login + " Логин уже используется");
                 return false;
             }
 
@@ -111,6 +114,7 @@ public class ClientHandler {
 
         else {
             out.writeUTF(AUTHERR_CMD_PREFIX + " Логин или пароль не соответствуют действительности");
+            LOGGER.warning(login + " " + password + " Логин или пароль не соответствуют действительности");
             return false;
         }
 
@@ -119,7 +123,7 @@ public class ClientHandler {
     private void readMessage() throws IOException {
         while (true) {
             String message = in.readUTF();
-            System.out.println("message | " + username + ": " + message);
+            LOGGER.info("Сообщение | " + username + ": " + message);
             if (message.startsWith(END_CMD_PREFIX)) {
                 return;
             }

@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.*;
 
 public class MyServer {
     private final ServerSocket serverSocket;
@@ -31,6 +32,7 @@ public class MyServer {
     public void setMessages(String message) {
         this.messages.addMessage(message);
     }
+    public static final Logger LOGGER = Logger.getLogger("");
 
     public MyServer(int port, int port2) throws IOException {
         this.serverSocket = new ServerSocket(port);
@@ -38,13 +40,38 @@ public class MyServer {
         this.authService = new BaseAuthService();
     }
 
+    private void parametersLogger() {
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+        try {
+            Handler handler;
+            handler = new FileHandler("src/main/resources/serve/logs/serverLog.log");
+            LOGGER.addHandler(handler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        LOGGER.getHandlers()[0].setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return record.getLevel() + "\t" + record.getMessage() + "\t" + dateFormat.format(record.getMillis()) +
+                        "\n";
+            }
+        });
+        LOGGER.getHandlers()[1].setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return record.getLevel() + "\t" + record.getMessage() + "\t" + dateFormat.format(record.getMillis()) +
+                        "\n";
+            }
+        });
+    }
+
     public BaseAuthService getAuthService() {
         return authService;
     }
 
     public void start() {
-
-        System.out.println("Сервер запущен!");
+        parametersLogger();
+        LOGGER.info("Сервер запущен!");
 
         try {
             while (true) {
@@ -57,10 +84,10 @@ public class MyServer {
     }
 
     private void waitAndProcessNewClientConnection() throws IOException {
-        System.out.println("Ожидание пользователя...");
+        LOGGER.info("Ожидание пользователя...");
         Socket socket = serverSocket.accept();
         Socket socket2 = serverSocket2.accept();
-        System.out.println("Клиент подключился");
+        LOGGER.info("Клиент подключился");
 
         processClientConnection(socket, socket2);
     }
