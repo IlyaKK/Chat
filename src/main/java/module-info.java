@@ -1,8 +1,8 @@
 module client {
-    requires javafx.controls;
-    requires javafx.fxml;
     requires java.sql;
-    requires sqlite.jdbc;
+    requires javafx.graphics;
+    requires javafx.fxml;
+    requires javafx.controls;
 
     opens client.controllers to javafx.fxml;
     exports client;
