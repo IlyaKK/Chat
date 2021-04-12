@@ -11,6 +11,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Network {
     private Socket socket;
@@ -26,6 +28,8 @@ public class Network {
 
     private final Message messages = new Message();
     private final Message localMessages = new Message();
+
+    public static Logger logger = LogManager.getLogger();
 
     private static final int DEFAULT_SERVER_SOCKET = 8888;
     private static final int DEFAULT_SERVER_SOCKET2 = 8889;
@@ -61,7 +65,7 @@ public class Network {
             out = new DataOutputStream(socket.getOutputStream());
 
         } catch (IOException e) {
-            System.out.println("Соединение не установлено");
+            logger.warn("Соединение не установлено");
             e.printStackTrace();
         }
     }
@@ -70,11 +74,14 @@ public class Network {
         try {
             out.writeUTF(String.format("%s %s %s", AUTH_CMD_PREFIX, login, password));
             String response = in.readUTF();
+            logger.info("Начало аутентификации");
 
             if (response.startsWith(AUTHOK_CMD_PREFIX)) {
+                logger.info("Аутентификация прошла успешно");
                 this.userName = response.split("\\s+", 2)[1];
                 return null;
             } else {
+                logger.warn(response.split("\\s+", 2)[1]);
                 return response.split("\\s+", 2)[1];
             }
         } catch (IOException e) {
@@ -131,11 +138,11 @@ public class Network {
                         String[] parts2 = message.split("\\s+", 2);
                         nickName = parts2[1];
                     } else {
-                        Platform.runLater(() -> System.out.println("!!Неизвестная ошибка сервера"));
+                        Platform.runLater(() -> logger.warn("!!Неизвестная ошибка сервера"));
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Ошибка подключения");
+                logger.warn("Ошибка подключения");
             }
 
         });

@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+import static client.models.Network.logger;
+
 public class AuthController {
     @FXML
     public TextField loginField;
@@ -29,7 +31,7 @@ public class AuthController {
         String password = passwordField.getText().trim();
 
         if(login.length() == 0 || password.length() == 0) {
-            System.out.println("!!Поля не должны быть пустыми");
+            logger.warn("!!Поля не должны быть пустыми");
             return;
         }
 
@@ -39,7 +41,7 @@ public class AuthController {
             mainChatGB.openChat();
         }
         else {
-            System.out.println("!!Ошибка аутентификации");
+            logger.warn("Ошибка аутентификации");
         }
     }
 }

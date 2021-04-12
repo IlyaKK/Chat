@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import static client.models.Network.logger;
+
 public class ChatController {
     @FXML
     private ListView<String> listPerson;
@@ -72,7 +74,7 @@ public class ChatController {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("!!Ошибка при отправке сообщения");
+                logger.warn("!!Ошибка при отправке сообщения");
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
