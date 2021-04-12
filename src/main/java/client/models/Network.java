@@ -18,6 +18,14 @@ public class Network {
     private DataInputStream in;
     private ObjectInputStream ois;
     private DataOutputStream out;
+    private final int port;
+    private final int port2;
+    private final String host;
+    private String userName;
+    private String nickName;
+
+    private final Message messages = new Message();
+    private final Message localMessages = new Message();
 
     private static final int DEFAULT_SERVER_SOCKET = 8888;
     private static final int DEFAULT_SERVER_SOCKET2 = 8889;
@@ -31,18 +39,8 @@ public class Network {
     private static final String SERVER_MSG_CMD_PREFIX = "/serverMsg"; // + msg
     private static final String PRIVATE_MSG_CMD_PREFIX = "/w"; //sender + p + msg
     private static final String CLIENT_ADD_CMD_PREFIX = "/addedClient"; // + clients
-    private static final String ADD_LAST_MESSAGES_CMD_PREFIX = "/addMessages";
-    private static final String ADD_LAST_MESSAGES_OK_CMD_PREFIX = "/addMessagesOk";
     private static final String END_CMD_PREFIX = "/end"; //
 
-    private final int port;
-    private final int port2;
-    private final String host;
-    private String userName;
-    private String nickName;
-
-    private final Message messages = new Message();
-    private final Message localMessages = new Message();
 
     public Network() {
         this.host = DEFAULT_SERVER_HOST;
@@ -66,6 +64,48 @@ public class Network {
             System.out.println("Соединение не установлено");
             e.printStackTrace();
         }
+    }
+
+    public String sendAuthCommand(String login, String password) {
+        try {
+            out.writeUTF(String.format("%s %s %s", AUTH_CMD_PREFIX, login, password));
+            String response = in.readUTF();
+
+            if (response.startsWith(AUTHOK_CMD_PREFIX)) {
+                this.userName = response.split("\\s+", 2)[1];
+                return null;
+            } else {
+                return response.split("\\s+", 2)[1];
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        }
+    }
+
+    public void addLastMessages(ChatController chatController){
+        try {
+            Object obj = receiveObject();
+            messages.setMessages((List<String>) obj);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        int sizeMessages = messages.getMessages().size();
+        if(sizeMessages < 100){
+            for (String message : messages.getMessages()) {
+                Platform.runLater(() -> chatController.addMessageToListMessage(message));
+            }
+        }else {
+            for (int i = 0; i < 100; i++) {
+                int finalI1 = i;
+                Platform.runLater(() -> chatController.addMessageToListMessage(messages.getMessages().get(sizeMessages - finalI1)));
+            }
+        }
+    }
+
+    public Object receiveObject () throws IOException, ClassNotFoundException
+    {
+        return ois.readObject();
     }
 
     public void waitMessage(ChatController chatController) {
@@ -104,25 +144,13 @@ public class Network {
         thread.start();
     }
 
-    public String sendAuthCommand(String login, String password) {
-        try {
-            out.writeUTF(String.format("%s %s %s", AUTH_CMD_PREFIX, login, password));
-            String response = in.readUTF();
-
-            if (response.startsWith(AUTHOK_CMD_PREFIX)) {
-                this.userName = response.split("\\s+", 2)[1];
-                return null;
-            } else {
-                return response.split("\\s+", 2)[1];
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return e.getMessage();
-        }
-    }
-
     public String getUsername() {
         return userName;
+    }
+
+    public void sendChangeNickCommand(String newNick) throws IOException {
+        String command = String.format("%s %s", CHANGE_NICKNAME_PREFIX, newNick);
+        sendMessage(command);
     }
 
     public void sendPrivateMessage(String message, String selectedRecipient) throws IOException {
@@ -140,36 +168,6 @@ public class Network {
         String endMessage = getUsername() + ": " + message + " : " + dateFormat.format(date);
         localMessages.addMessage(endMessage);
         out.writeUTF(message);
-    }
-
-    public void sendChangeNickCommand(String newNick) throws IOException {
-        String command = String.format("%s %s", CHANGE_NICKNAME_PREFIX, newNick);
-        sendMessage(command);
-    }
-
-    public Object receiveObject () throws IOException, ClassNotFoundException
-    {
-        return ois.readObject();
-    }
-
-    public void addLastMessages(ChatController chatController){
-            try {
-                Object obj = receiveObject();
-                messages.setMessages((List<String>) obj);
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            int sizeMessages = messages.getMessages().size();
-            if(sizeMessages < 100){
-                for (String message : messages.getMessages()) {
-                    Platform.runLater(() -> chatController.addMessageToListMessage(message));
-                }
-            }else {
-                for (int i = 0; i < 100; i++) {
-                    int finalI1 = i;
-                    Platform.runLater(() -> chatController.addMessageToListMessage(messages.getMessages().get(sizeMessages - finalI1)));
-                }
-            }
     }
 
     public void saveLocalMessages() {

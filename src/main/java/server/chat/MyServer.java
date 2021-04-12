@@ -131,6 +131,7 @@ public class MyServer {
             }
             if(isServerMessage.equals("/serverMsg")){
                 client.sendServerMessage(message + " : " + dateFormat.format(date));
+                LOGGER.info(message + " : " + dateFormat.format(date));
             }else {
                 client.sendMessage(sender.getUsername(), message, sender);
             }

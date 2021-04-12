@@ -2,7 +2,6 @@ package client.controllers;
 
 import client.ChatGB;
 import client.models.Network;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -35,6 +34,7 @@ public class AuthController {
         }
 
         String authErrorMessage = network.sendAuthCommand(login, password);
+
         if (authErrorMessage == null) {
             mainChatGB.openChat();
         }

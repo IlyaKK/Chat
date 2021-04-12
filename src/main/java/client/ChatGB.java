@@ -31,19 +31,6 @@ public class ChatGB extends Application {
         createChatDialog();
     }
 
-    private void createChatDialog() throws IOException {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(ChatGB.class.getResource("views/chat-view.fxml"));
-
-        Parent root = loader.load();
-
-        primaryStage.setTitle("Chat");
-        primaryStage.setScene(new Scene(root));
-
-        chatController = loader.getController();
-        chatController.setNetwork(network);
-    }
-
     private void openAuthDialog() throws IOException {
         FXMLLoader authLoader = new FXMLLoader();
         authLoader.setLocation(ChatGB.class.getResource("views/auth-view.fxml"));
@@ -60,6 +47,19 @@ public class ChatGB extends Application {
         AuthController authLoaderController = authLoader.getController();
         authLoaderController.setNetwork(network);
         authLoaderController.setChatGB(this);
+    }
+
+    private void createChatDialog() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(ChatGB.class.getResource("views/chat-view.fxml"));
+
+        Parent root = loader.load();
+
+        primaryStage.setTitle("Chat");
+        primaryStage.setScene(new Scene(root));
+
+        chatController = loader.getController();
+        chatController.setNetwork(network);
     }
 
 

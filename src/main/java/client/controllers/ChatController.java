@@ -30,7 +30,6 @@ public class ChatController {
 
     private Network network;
 
-    private final ObservableList<String> messageList = FXCollections.observableArrayList();
     private String selectedRecipient;
 
     public void updatePersonsInList(List<String> newListPersons) {
@@ -86,7 +85,6 @@ public class ChatController {
     }
 
     public void addMessageToListMessage(String message) {
-        //listMessage.getItems().add(message + " : " + dateFormat.format(date));
         listMessage.getItems().add(message);
     }
 
@@ -175,9 +173,8 @@ public class ChatController {
         newWindow.show();
     }
 
-    @FXML
-    void exit() {
-        System.exit(0);
+    public void setNetwork(Network network) {
+        this.network = network;
     }
 
     @FXML
@@ -189,7 +186,8 @@ public class ChatController {
         alert.show();
     }
 
-    public void setNetwork(Network network) {
-        this.network = network;
+    @FXML
+    void exit() {
+        System.exit(0);
     }
 }
