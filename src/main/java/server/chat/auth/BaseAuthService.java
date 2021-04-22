@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static server.chat.MyServer.LOGGER;
+
 public class BaseAuthService implements AuthService {
     private static final List<User> clients = new ArrayList<>();
     @Override
@@ -54,12 +56,11 @@ public class BaseAuthService implements AuthService {
 
     @Override
     public void startAuthentication() {
-        System.out.println("Стар аутентификации");
+        LOGGER.info("Старт аутентификации");
     }
 
     @Override
     public void endAuthentication() {
-        System.out.println("Окончание аутентификации");
-
+        LOGGER.info("Окончание аутентификации");
     }
 }
